@@ -1,0 +1,10 @@
+Django==4.2.23
+gunicorn==23.0.0
+uvicorn
+requests==2.32.4
+whitenoise==6.9.0
+django-ninja
+django-cors-headers
+djangorestframework==3.16.1
+psycopg2-binary
+dotenv

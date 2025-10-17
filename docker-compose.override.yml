@@ -1,0 +1,35 @@
+services:
+  backend:
+    build: ./backend
+    container_name: ecs_backend
+    env_file:
+      - .env
+    volumes:
+      # Mount your backend source code so edits are live inside the container
+      - ./backend:/app
+      # Keep installed dependencies separate to avoid overwriting container site-packages
+      - /app/venv
+      - static_volume:/app/staticfiles
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+
+  web:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    container_name: ecs_web
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      # Mount frontend source (useful if you tweak frontend build before rebuild)
+      - ./frontend:/app/frontend
+      - static_volume:/static
+      # Optional: Hot reload default.conf during dev (if you edit nginx)
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+volumes:
+  static_volume:

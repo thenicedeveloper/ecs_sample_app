@@ -1,0 +1,23 @@
+services:
+  backend:
+    build: ./backend
+    env_file:
+      - .env
+    volumes:
+      - static_volume:/app/staticfiles
+    expose:
+      - "8000"
+
+  web:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      - static_volume:/static
+
+volumes:
+  static_volume:
