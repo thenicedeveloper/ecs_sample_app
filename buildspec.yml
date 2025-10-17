@@ -1,0 +1,26 @@
+version: 0.2
+env:
+  secrets-manager:
+    IMAGE_REPO_NAME: "ecs_demo_sample_app_secrets:IMAGE_REPO_NAME"
+    AWS_REGION: "ecs_demo_sample_app_secrets:AWS_REGION"
+    ACCOUNT_ID: "ecs_demo_sample_app_secrets:ACCOUNT_ID"
+
+phases:
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+
+  build:
+    commands:
+      - docker build -t "$IMAGE_REPO_NAME:$IMAGE_TAG" .
+      - docker tag "$IMAGE_REPO_NAME:$IMAGE_TAG" "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG"
+
+  post_build:
+    commands:
+      - docker push "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG"
+      - printf '[{"name":"ecs-demo-app","imageUri":"%s"}]' "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG" > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
