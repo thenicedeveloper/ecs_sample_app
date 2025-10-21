@@ -6,14 +6,13 @@ env:
     BACKEND_REPO_NAME: "ecs_demo_sample_app_secrets:BACKEND_REPO_NAME"
     FRONTEND_REPO_NAME: "ecs_demo_sample_app_secrets:FRONTEND_REPO_NAME"
 
-
 phases:
   pre_build:
     commands:
       - echo Logging into Amazon ECR...
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - echo "Using tag: $IMAGE_TAG"
+      - echo "Using image tag $IMAGE_TAG"
 
   build:
     commands:
