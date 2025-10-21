@@ -1,23 +1,11 @@
-services:
-  backend:
-    build: ./backend
-    env_file:
-      - .env
-    volumes:
-      - static_volume:/app/staticfiles
-    expose:
-      - "8000"
+version: "3.9"
 
-  web:
+services:
+  frontend:
     build:
       context: .
       dockerfile: ./nginx/Dockerfile
-    depends_on:
-      - backend
+    container_name: ecs_frontend
     ports:
       - "80:80"
-    volumes:
-      - static_volume:/static
-
-volumes:
-  static_volume:
+    restart: unless-stopped
