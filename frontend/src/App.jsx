@@ -3,8 +3,8 @@ import Navbar from './components/Navbar'
 import Footer from "./components/Footer"
 import Home from './pages/Home'
 import About from './pages/About'
+import Sample from './pages/Sample'   // <-- ADD THIS
 import './index.css'
-
 
 export default function App() {
   return (
@@ -13,6 +13,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/sample" element={<Sample />} />   {/* <-- ADD THIS */}
       </Routes>
       <Footer />
     </BrowserRouter>

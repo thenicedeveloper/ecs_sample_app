@@ -10,6 +10,7 @@ export default function Navbar() {
       <div className="space-x-4">
         <Link to="/" className="hover:text-gray-300">Home</Link>
         <Link to="/about" className="hover:text-gray-300">About</Link>
+        <Link to="/sample" className="hover:text-gray-300">Sample Test</Link> {/* NEW */}
       </div>
     </nav>
   )
