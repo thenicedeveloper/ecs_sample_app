@@ -10,3 +10,12 @@ def get_info(request):
     Returns container info for host, docker, or ECS.
     """
     return get_container_info()
+
+
+# Django ninja cpu killer
+@router.get("/burncpu")
+def burn(request):
+    x = 0
+    for i in range(50_000_000):
+        x += i
+    return {"done": True}
