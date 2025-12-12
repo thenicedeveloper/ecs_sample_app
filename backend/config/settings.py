@@ -41,7 +41,7 @@ try:
 except Exception:
     default_host = "127.0.0.1"
 
-ALLOWED_HOSTS = default_host.split(",") + ["localhost", "127.0.0.1", 'node_demo.ipro.org', 'node-demo.ipro.org']
+ALLOWED_HOSTS = default_host.split(",") + ["localhost", "127.0.0.1", 'node_demo.ipro.org', 'node-demo.ipro.org', 'node_demo_v2.ipro.org']
 
 
 # Application definition
