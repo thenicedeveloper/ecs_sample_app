@@ -1,10 +1,12 @@
 version: 0.2
+
 env:
   secrets-manager:
     AWS_REGION: "ecs_demo_sample_app_secrets:AWS_REGION"
     ACCOUNT_ID: "ecs_demo_sample_app_secrets:ACCOUNT_ID"
     BACKEND_REPO_NAME: "ecs_demo_sample_app_secrets:BACKEND_REPO_NAME"
     FRONTEND_REPO_NAME: "ecs_demo_sample_app_secrets:FRONTEND_REPO_NAME"
+    TLS_REPO_NAME: "ecs_demo_sample_app_secrets:TLS_REPO_NAME"
 
 phases:
   pre_build:
@@ -17,28 +19,51 @@ phases:
   build:
     commands:
       - echo Building backend image...
-      - docker build -t "$BACKEND_REPO_NAME:$IMAGE_TAG" -f backend/Dockerfile ./backend
+      - docker build \
+          -t "$BACKEND_REPO_NAME:$IMAGE_TAG" \
+          -f backend/Dockerfile \
+          ./backend
 
       - echo Building frontend image...
-      - docker build -t "$FRONTEND_REPO_NAME:$IMAGE_TAG" -f nginx/Dockerfile .
+      - docker build \
+          -t "$FRONTEND_REPO_NAME:$IMAGE_TAG" \
+          -f nginx/Dockerfile.frontend \
+          .
+
+      - echo Building TLS image...
+      - docker build \
+          -t "$TLS_REPO_NAME:$IMAGE_TAG" \
+          -f nginx/Dockerfile.tls \
+          .
 
       - echo Tagging images for ECR...
-      - docker tag "$BACKEND_REPO_NAME:$IMAGE_TAG" "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_REPO_NAME:$IMAGE_TAG"
-      - docker tag "$FRONTEND_REPO_NAME:$IMAGE_TAG" "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO_NAME:$IMAGE_TAG"
+      - docker tag "$BACKEND_REPO_NAME:$IMAGE_TAG" \
+          "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_REPO_NAME:$IMAGE_TAG"
+      - docker tag "$FRONTEND_REPO_NAME:$IMAGE_TAG" \
+          "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO_NAME:$IMAGE_TAG"
+      - docker tag "$TLS_REPO_NAME:$IMAGE_TAG" \
+          "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$TLS_REPO_NAME:$IMAGE_TAG"
 
   post_build:
     commands:
       - echo Pushing backend image...
-      - docker push "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_REPO_NAME:$IMAGE_TAG"
+      - docker push \
+          "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_REPO_NAME:$IMAGE_TAG"
 
       - echo Pushing frontend image...
-      - docker push "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO_NAME:$IMAGE_TAG"
+      - docker push \
+          "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO_NAME:$IMAGE_TAG"
+
+      - echo Pushing TLS image...
+      - docker push \
+          "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$TLS_REPO_NAME:$IMAGE_TAG"
 
       - echo Writing imagedefinitions.json...
-      - printf '[{"name":"backend","imageUri":"%s"},{"name":"web","imageUri":"%s"}]' \
-        "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_REPO_NAME:$IMAGE_TAG" \
-        "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO_NAME:$IMAGE_TAG" \
-        > imagedefinitions.json
+      - printf '[{"name":"backend","imageUri":"%s"},{"name":"web","imageUri":"%s"},{"name":"tls","imageUri":"%s"}]' \
+          "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_REPO_NAME:$IMAGE_TAG" \
+          "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPO_NAME:$IMAGE_TAG" \
+          "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$TLS_REPO_NAME:$IMAGE_TAG" \
+          > imagedefinitions.json
 
 artifacts:
   files:
