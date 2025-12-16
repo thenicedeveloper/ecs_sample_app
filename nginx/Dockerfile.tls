@@ -1,8 +1,10 @@
 FROM nginx:alpine
 
-# Copy TLS nginx config
+# Copy TLS nginx config (no certs baked in)
 COPY nginx/default-ssl.conf /etc/nginx/conf.d/default.conf
 
-# Copy SSL certs
-COPY nginx/selfsigned.crt /etc/ssl/certs/selfsigned.crt
-COPY nginx/selfsigned-rsa.key /etc/ssl/private/selfsigned-rsa.key
+# Copy entrypoint that materializes certs from env vars
+COPY nginx/docker-entrypoint.tls.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+ENTRYPOINT ["/docker-entrypoint.sh"]

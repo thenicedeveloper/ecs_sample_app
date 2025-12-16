@@ -1,8 +1,6 @@
 services:
   backend:
     build: ./backend
-    env_file:
-      - .env
     volumes:
       - static_volume:/app/staticfiles
     expose:
@@ -27,9 +25,9 @@ services:
       - react-service
     ports:
       - "443:443"
-    volumes:
-      - /home/jpdevops/code/python/django/ecs_fs_sample_app/nginx/selfsigned.crt:/etc/ssl/certs/selfsigned.crt:ro
-      - /home/jpdevops/code/python/django/ecs_fs_sample_app/nginx/selfsigned-rsa.key:/etc/ssl/private/selfsigned-rsa.key:ro
+    environment:
+      - TLS_CERT
+      - TLS_KEY
 
 volumes:
   static_volume:
